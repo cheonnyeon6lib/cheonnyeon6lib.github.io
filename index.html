@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>우리 도서관 도서검색</title>
+<style>
+body { font-family: sans-serif; padding:20px; }
+input { width:70%; padding:8px; }
+button { padding:8px; }
+table { width:100%; border-collapse: collapse; margin-top:20px; }
+th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+</style>
+</head>
+<body>
+
+<h2>📚 우리 도서관 도서 검색</h2>
+
+<input id="keyword" placeholder="도서명·저자·출판사 검색">
+<button onclick="search()">검색</button>
+
+<table>
+<thead>
+<tr><th>서명</th><th>저자</th><th>출판사</th></tr>
+</thead>
+<tbody id="result"></tbody>
+</table>
+
+<script>
+const csvUrl = "여기에_웹에게시_CSV_주소";
+
+async function search() {
+  const key = document.getElementById("keyword").value;
+  const res = await fetch(csvUrl);
+  const text = await res.text();
+  const rows = text.split("\n").slice(1);
+  const tbody = document.getElementById("result");
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    if (r.includes(key)) {
+      const c = r.split(",");
+      tbody.innerHTML += `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td></tr>`;
+    }
+  });
+}
+</script>
+
+</body>
+</html>
