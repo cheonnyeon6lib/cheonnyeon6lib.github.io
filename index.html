@@ -2,15 +2,50 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>천년나무6단지 작은도서관 도서 검색</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <title>천년나무6단지 작은도서관 도서검색</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    select, input {
+      padding: 6px;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
 
-<h2>📚 도서 검색</h2>
-<input type="text" id="search" placeholder="도서명 · 저자 · 출판사 검색">
+<h2>📚 천년나무6단지 작은도서관 도서 검색</h2>
 
-<table border="1">
+<!-- 🔽 검색 옵션 -->
+<select id="searchType">
+  <option value="all">전체</option>
+  <option value="서명">서명</option>
+  <option value="저자">저자</option>
+  <option value="출판사">출판사</option>
+</select>
+
+<input type="text" id="search" placeholder="검색어 입력">
+
+<table>
   <thead>
     <tr>
       <th>서명</th>
@@ -21,6 +56,7 @@
   <tbody id="result"></tbody>
 </table>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
 let books = [];
 
@@ -32,27 +68,39 @@ fetch("books.xlsx")
     books = XLSX.utils.sheet_to_json(sheet);
   });
 
-document.getElementById("search").addEventListener("input", function () {
-  const q = this.value.toLowerCase();
+document.getElementById("search").addEventListener("input", () => {
+  const q = document.getElementById("search").value.toLowerCase();
+  const type = document.getElementById("searchType").value;
   const tbody = document.getElementById("result");
+
   tbody.innerHTML = "";
 
-  books.filter(b =>
-    (b.도서명 || "").toLowerCase().includes(q) ||
-    (b.저자 || "").toLowerCase().includes(q) ||
-    (b.출판사 || "").toLowerCase().includes(q)
-  ).forEach(b => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${b.서명}</td>
-        <td>${b.저자}</td>
-        <td>${b.출판사}</td>
-      </tr>
+  books.filter(b => {
+    if (type === "서명") {
+      return (b.서명 || "").toLowerCase().includes(q);
+    }
+    if (type === "저자") {
+      return (b.저자 || "").toLowerCase().includes(q);
+    }
+    if (type === "출판사") {
+      return (b.출판사 || "").toLowerCase().includes(q);
+    }
+    return (
+      (b.서명 || "").toLowerCase().includes(q) ||
+      (b.저자 || "").toLowerCase().includes(q) ||
+      (b.출판사 || "").toLowerCase().includes(q)
+    );
+  }).forEach(b => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.서명 || ""}</td>
+      <td>${b.저자 || ""}</td>
+      <td>${b.출판사 || ""}</td>
     `;
+    tbody.appendChild(tr);
   });
 });
 </script>
 
 </body>
 </html>
-
