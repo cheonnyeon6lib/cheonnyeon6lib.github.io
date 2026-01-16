@@ -1,51 +1,57 @@
 <!DOCTYPE html>
 <html lang="ko">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <head>
-<meta charset="UTF-8">
-<title>우리 도서관 도서검색</title>
-<style>
-body { font-family: sans-serif; padding:20px; }
-input { width:70%; padding:8px; }
-button { padding:8px; }
-table { width:100%; border-collapse: collapse; margin-top:20px; }
-th, td { border:1px solid #ccc; padding:8px; text-align:left; }
-</style>
+  <meta charset="UTF-8">
+  <title>천년나무6단지 작은도서관 도서 검색</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<h2>📚 우리 도서관 도서 검색</h2>
+<h2>📚 도서 검색</h2>
+<input type="text" id="search" placeholder="도서명 · 저자 · 출판사 검색">
 
-<input id="keyword" placeholder="도서명·저자·출판사 검색">
-<button onclick="search()">검색</button>
-
-<table>
-<thead>
-<tr><th>서명</th><th>저자</th><th>출판사</th></tr>
-</thead>
-<tbody id="result"></tbody>
+<table border="1">
+  <thead>
+    <tr>
+      <th>도서명</th>
+      <th>저자</th>
+      <th>출판사</th>
+    </tr>
+  </thead>
+  <tbody id="result"></tbody>
 </table>
 
 <script>
-const csvUrl = "여기에_웹에게시_CSV_주소";
+let books = [];
 
-async function search() {
-  const key = document.getElementById("keyword").value;
-  const res = await fetch(csvUrl);
-  const text = await res.text();
-  const rows = text.split("\n").slice(1);
+fetch("books.xlsx")
+  .then(res => res.arrayBuffer())
+  .then(data => {
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    books = XLSX.utils.sheet_to_json(sheet);
+  });
+
+document.getElementById("search").addEventListener("input", function () {
+  const q = this.value.toLowerCase();
   const tbody = document.getElementById("result");
   tbody.innerHTML = "";
 
-  rows.forEach(r => {
-    if (r.includes(key)) {
-      const c = r.split(",");
-      tbody.innerHTML += `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td></tr>`;
-    }
+  books.filter(b =>
+    (b.도서명 || "").toLowerCase().includes(q) ||
+    (b.저자 || "").toLowerCase().includes(q) ||
+    (b.출판사 || "").toLowerCase().includes(q)
+  ).forEach(b => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${b.도서명}</td>
+        <td>${b.저자}</td>
+        <td>${b.출판사}</td>
+      </tr>
+    `;
   });
-}
+});
 </script>
 
 </body>
-
 </html>
