@@ -13,7 +13,7 @@
 <table border="1">
   <thead>
     <tr>
-      <th>도서명</th>
+      <th>서명</th>
       <th>저자</th>
       <th>출판사</th>
     </tr>
@@ -44,7 +44,7 @@ document.getElementById("search").addEventListener("input", function () {
   ).forEach(b => {
     tbody.innerHTML += `
       <tr>
-        <td>${b.도서명}</td>
+        <td>${b.서명}</td>
         <td>${b.저자}</td>
         <td>${b.출판사}</td>
       </tr>
@@ -55,3 +55,4 @@ document.getElementById("search").addEventListener("input", function () {
 
 </body>
 </html>
+
